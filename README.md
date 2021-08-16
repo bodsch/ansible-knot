@@ -1,7 +1,7 @@
 
 # Ansible Role:  `knot`
 
-This role will fully configure and install [knot](https://www.docker.com/).
+This role will fully configure and install [knot](https://github.com/CZ-NIC/knot).
 
 [![GitHub Workflow Status](https://img.shields.io/github/workflow/status/bodsch/ansible-icinga2/CI)][ci]
 [![GitHub issues](https://img.shields.io/github/issues/bodsch/ansible-knot)][issues]
