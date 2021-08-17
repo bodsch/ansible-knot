@@ -1,0 +1,88 @@
+---
+
+- name: 'update configuration'
+  template:
+    src: 'etc/knot/knot.conf.j2'
+    dest: '/etc/knot/knot.conf'
+    owner: 'root'
+    group: "{{ knot_group }}"
+    mode: "0640"
+    validate: "{{ knot_knotc }} -c %s conf-check"
+    backup: true
+  notify:
+    - 'knot restart'
+
+- debug:
+    msg:
+      - "{{ knot_zones | list }}"
+      - "{{ knot_zones }}"
+
+- name: "handle zone configs"
+  knot_zone:
+    state: "{{ item.value.state | default('present') }}"
+    database_path: "{{ knot_database }}"
+    zone: "{{ item.key }}"
+    zone_ttl: "{{ item.value.ttl | default('3600') }}"
+    zone_soa: "{{ item.value.soa | default({}) }}"
+    name_servers: "{{ item.value.name_servers | default({}) }}"
+    records: "{{ item.value.records | default({}) }}"
+  loop  :
+    "{{ knot_zones | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+  notify:
+    - 'knot reload'
+
+# - name: 'check if zone file exists'
+#   stat:
+#     path: "{{ knot_database }}/{{ item }}.zone"
+#   when: >
+#     item.state | default('present') == 'present'
+#   loop:
+#     "{{ knot_zones | list }}"
+#   loop_control:
+#     label: "{{ item }}"
+#   register: knot_zone_exists
+#
+# - debug:
+#     msg:
+#       - "{{ knot_zone_exists }}"
+#
+# - name: 'update zone file'
+#   template:
+#     src: 'zone/zone.conf.j2'
+#     dest: "{{ knot_database }}/{{ item.key }}.zone"
+#     owner: "{{ knot_user }}"
+#     group: "{{ knot_group }}"
+#     mode: "0640"
+#     backup: true
+#   when:
+#     - item.value.state | default('present') != 'absent'
+#
+#     # and (
+#     #   (item.stat is defined and
+#     #     not item.stat.exists and
+#     #     item.value.state | default('present') == 'present')
+#     #   or item.value.state | default('present') == 'force'
+#     # )
+#   with_dict:
+#     "{{ knot_zones }}" # knot_zone_exists.results }}"
+#   loop_control:
+#     label: "{{ item.key }}"
+#   notify:
+#     - 'knot reload'
+#
+# - name: 'delete zone file'
+#   file:
+#     path: "{{ knot_database }}/{{ item.key }}.zone"
+#     state: 'absent'
+#   when: >
+#     item.value.state | default('present') == 'absent'
+#   with_dict:
+#     "{{ knot_zones }}"
+#   loop_control:
+#     label: "{{ item.key }}"
+#   notify:
+#     - 'knot reload'
+
+...

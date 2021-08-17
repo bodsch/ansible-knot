@@ -1,0 +1,50 @@
+{# ######################################## #}
+{# ##### MACROS ########################### #}
+{# ######################################## #}
+{% macro display_dict(cfg, dict, indent=0) %}
+{% if cfg == 'log' -%}
+{%      set id = 'target' -%}
+{% elif cfg == 'remote' -%}
+{%      set id = 'id' -%}
+{% elif cfg == 'key' -%}
+{%      set id = 'id' -%}
+{% elif cfg == 'acl' -%}
+{%      set id = 'id' -%}
+{% elif cfg == 'template' -%}
+{%      set id = 'id' -%}
+{% elif cfg == 'zone' -%}
+{%      set id = 'domain' -%}
+{% endif -%}
+{% if id is defined -%}
+{{ id }}: {{ dict[id] }}
+{% endif -%}
+{% for (key, value) in dict|dictsort -%}
+{% if id is not defined or key != id -%}
+{%      if value is string %}
+{{ ' ' * indent }}{{ key }}: {{ value }}
+{%      elif value is iterable %}
+{%          for i in value|sort %}
+{{ ' ' * indent }}{{ key }}: {{ i }}
+{%          endfor %}
+{%      else %}
+{{ ' ' * indent }}{{ key }}: {{ value }}
+{%      endif %}
+{%  endif %}
+{%- endfor %}
+{% endmacro %}
+{# ######################################## #}
+{# ##### MAIN ############################# #}
+{# ######################################## #}
+
+server:
+{{ display_dict('server', knot_config['server'], 4) }}
+{% for c in ['log', 'remote', 'key', 'acl', 'template', 'zone'] -%}
+{{ c }}:
+{% if c in knot_config and knot_config[c] is iterable -%}
+{%      for i in knot_config[c] | default([]) -%}
+{{ ' ' * 2 }}- {{ display_dict(c, i, 4) }}
+{%      endfor %}
+{%  else %}
+
+{%  endif %}
+{% endfor %}

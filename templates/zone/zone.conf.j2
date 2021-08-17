@@ -1,0 +1,47 @@
+# {{ ansible_managed }}
+{#
+ #  First create a dict holding the entire zone information and create a hash
+ #  from it, that it can be compared with subsequent task executions. In this
+ #  way the serial will only be updated if there are some content changes.
+ #}
+{% set _zone_data = {} %}
+{% set _ = _zone_data.update({'ttl': item.value.ttl}) %}
+{% set _ = _zone_data.update({'domain': item.key}) %}
+{% set _ = _zone_data.update({'mname': item.value.name_servers       | default([])}) %}
+{% set _ = _zone_data.update({'aname': item.value.other_name_servers | default([])}) %}
+{% set _ = _zone_data.update({'mail' : item.value.mail_servers       | default([])}) %}
+{% if item.value.hostmaster_email is defined %}
+{% set _ = _zone_data.update({'rname': (( item.value.hostmaster_email )) + ('' if (item.hostmaster_email is search('\.')) else ('.' + _zone_data['domain']))}) %}
+{% else %}
+{% set _ = _zone_data.update({'rname': 'hostmaster.' + _zone_data['domain']}) %}
+{% endif %}
+{% set _ = _zone_data.update({'refresh' : item.value.soa.refresh | default('6h') }) %}
+{% set _ = _zone_data.update({'retry'   : item.value.soa.retry   | default('1h')}) %}
+{% set _ = _zone_data.update({'expire'  : item.value.soa.expire  | default('1w') }) %}
+{% set _ = _zone_data.update({'minimum' : item.value.soa.minimum | default('1d')}) %}
+{% set _ = _zone_data.update({'hosts'   : item.value.records     | default([])}) %}
+{% set _ = _zone_data.update({'delegate': item.value.delegate    | default([])}) %}
+{% set _ = _zone_data.update({'services': item.value.services    | default([])}) %}
+{% set _ = _zone_data.update({'text'    : item.value.text        | default([])}) %}
+{#
+ #  Compare the zone file hash with the current zone data hash and set serial
+ #  accordingly
+ #}
+{% set _zone = {'hash': _zone_data | string | hash('md5')} %}
+; {{ _zone }}
+
+
+
+$ORIGIN {{ item.key }}.
+$TTL {{ item.value.ttl | default('3600') }}
+
+@  SOA  {{ item.value.soa.mname }}. {{ item.value.soa.rname | default('hostmaster.' + item.key) }}. (
+    {{ item.value.soa.serial | default(ansible_facts['date_time']['year'] + ansible_facts['date_time']['month'] + ansible_facts['date_time']['day']) + '01' }} ; serial
+    {{ item.value.soa.refresh | default('6h') }} ; refresh
+    {{ item.value.soa.retry | default('1h') }} ; retry
+    {{ item.value.soa.expire | default('1w') }} ; expire
+    {{ item.value.soa.minimum | default('1d') }} ) ; minimum
+
+{% for r in item.value.records | default([]) %}
+{{ r.name.ljust(20) | default('') }}  {{ r.type | default('') }}  {{ r.class | default('') }}  {{ r.ttl | default('') }}  {{ r.rdata }}
+{% endfor %}

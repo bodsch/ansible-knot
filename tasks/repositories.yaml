@@ -1,0 +1,26 @@
+---
+
+- name: debain based
+  block:
+    - name: add apt signing key (debian)
+      become: true
+      apt_key:
+        id: 8C0A90B7DE9CAC3B4A7BD5798A0EFB02C84B1E9B
+        url: https://deb.knot-dns.cz/apt.gpg
+
+    - name: install official docker repositories for debian based
+      template:
+        src: apt_knot.list.j2
+        dest: /etc/apt/sources.list.d/knot.list
+        mode: 0644
+        owner: root
+        group: root
+  when:
+    - ansible_os_family | lower == 'debian'
+
+
+- name: update package cache
+  package:
+    update_cache: true
+
+...

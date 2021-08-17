@@ -1,0 +1,97 @@
+# {{ ansible_managed }}
+
+# https://www.knot-dns.cz/docs/3.0/singlehtml/
+
+# https://www.knot-dns.cz/docs/3.0/singlehtml/#server-section
+{% if knot_config %}
+server:
+  rundir: "{{  knot_config.server.rundir }}"
+  user: {{ knot_user }}:{{ knot_group }}
+{% if knot_config.server.listen %}
+{% for listen in knot_config.server.listen %}
+  listen: {{ listen }}
+{% endfor %}
+{% endif %}
+
+# https://www.knot-dns.cz/docs/3.0/singlehtml/#logging-section
+{% if knot_config.log %}
+log:
+{% for k, v in knot_config.log.items() %}
+  - target: {{ k }}
+{% for x,y in v.items() %}
+    {{ x }}: {{ y }}
+{% endfor %}
+{% endfor %}
+{% endif %}
+
+# https://www.knot-dns.cz/docs/3.0/singlehtml/#database-section
+{% if knot_config.database %}
+database:
+{% for x,y in knot_config.database.items() %}
+  {{ x }}: {{ y }}
+{% endfor %}
+{% else %}
+# database:
+#     storage: STR
+#     journal-db: STR
+#     journal-db-mode: robust | asynchronous
+#     journal-db-max-size: SIZE
+#     kasp-db: STR
+#     kasp-db-max-size: SIZE
+#     timer-db: STR
+#     timer-db-max-size: SIZE
+#     catalog-db: str
+#     catalog-db-max-size: SIZE
+{% endif %}
+
+# https://www.knot-dns.cz/docs/3.0/singlehtml/#remote-section
+{% if knot_config.remote %}
+remote:
+{% for k, v in knot_config.remote.items() %}
+  - id: {{ k }}
+{% for x,y in v.items() %}
+    {{ x }}: {{ y }}
+{% endfor %}
+{% endfor %}
+{% endif %}
+
+# https://www.knot-dns.cz/docs/3.0/singlehtml/#acl-section
+{% if knot_config.acl %}
+acl:
+{% for k, v in knot_config.acl.items() %}
+  - id: {{ k }}
+{% for x,y in v.items() %}
+    {{ x }}: {{ y }}
+{% endfor %}
+{% endfor %}
+{% endif %}
+
+# https://www.knot-dns.cz/docs/3.0/singlehtml/#template-section
+{% if knot_config.template %}
+template:
+{% for k, v in knot_config.template.items() %}
+  - id: {{ k }}
+{% for x,y in v.items() %}
+    {{ x }}: {{ y }}
+{% endfor %}
+{% endfor %}
+{% endif %}
+
+# https://www.knot-dns.cz/docs/3.0/singlehtml/#zone-section
+{% if knot_config.zone %}
+zone:
+{% for k, v in knot_config.zone.items() %}
+  - domain: {{ k }}
+{% for x,y in v.items() %}
+    {{ x }}: {{ y }}
+{% endfor %}
+{% endfor %}
+{% endif %}
+
+# https://www.knot-dns.cz/docs/3.0/singlehtml/#control-section
+# https://www.knot-dns.cz/docs/3.0/singlehtml/#statistics-section
+# https://www.knot-dns.cz/docs/3.0/singlehtml/#key-section
+# https://www.knot-dns.cz/docs/3.0/singlehtml/#submission-section
+# https://www.knot-dns.cz/docs/3.0/singlehtml/#policy-section
+
+{% endif %}

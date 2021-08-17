@@ -1,0 +1,93 @@
+---
+
+knot_user: knot
+knot_group: knot
+
+knot_config:
+  server:
+    rundir: "/run/knot"
+    user: "{{ knot_user }}:{{ knot_group }}"
+    listen:
+      # - '127.0.0.1@53'
+      - '127.0.0.1@5353'
+      # - '::1@53'
+
+  log:
+    syslog:
+      any: info
+    stderr:
+      server: critical
+      any: debug
+
+  database:
+    storage: "{{ knot_database }}"
+
+  # remote:
+  #    master:
+  #      address: 192.168.2.1@53
+  #    slave:
+  #      address: 192.168.1.1@53
+
+#   acl:
+#     acl_internal:
+#       address: 192.168.0.0/24
+#       action: transfer
+#     acl_slave:
+#       address: 192.168.1.1
+#       action: transfer
+
+  template:
+    default:
+      storage: "{{ knot_database }}"
+      file: "%s.zone"
+
+  zone:
+    matrix.lan: {}
+      # master: master
+      #acl:
+      #  - acl_internal
+
+knot_zones:
+#  - zone: 'molecule.internal'
+  matrix.lan:
+    # state: absent
+    ttl: 3600
+    soa:
+      primary_dns: 'dns.matrix.lan'
+      hostmaster: 'hostmaster.matrix.lan'
+      refresh: 6h
+      retry: 1h
+      expire: 1w
+      minimum: 1d
+    name_servers:
+      dns.matrix.lan:
+        ip: '{{ ansible_default_ipv4.address }}'
+    records:
+      blackbox.matrix.lan:
+        type: 'A'
+        ip: '{{ ansible_default_ipv4.address }}'
+      fritz.matrix.lan:
+        type: 'A'
+        ip: 192.168.0.1
+      skaro.matrix.lan:
+        type: 'A'
+        ip: 192.168.0.3
+      brennstuhl.matrix.lan:
+        type: 'A'
+        ip: 192.168.0.4
+
+      ldap.matrix.lan:
+        type: 'CNAME'
+        target: 'blackbox.matrix.lan'
+
+  molecule.internal:
+    state: absent
+    ttl: 3600
+    soa:
+      primary_dns: 'dns.matrix.lan'
+      hostmaster: 'hostmaster.matrix.lan'
+      refresh: 6h
+      retry: 1h
+      expire: 1w
+      minimum: 1d
+...

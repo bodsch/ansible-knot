@@ -1,0 +1,11 @@
+molecule
+molecule-docker
+docker
+ansible-lint==5.0.3
+yamllint
+flake8
+jmespath
+pytest
+pytest-testinfra
+tox
+tox-gh-actions
