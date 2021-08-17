@@ -31,6 +31,31 @@ Tested on
 
 ```
 
+```bash
+knotc conf-begin
+knotc conf-set zone.domain matrix.lan
+knotc conf-commit
+
+knotc zone-begin matrix.lan
+knotc zone-set matrix.lan @ 7200 SOA dns hostmaster 1 86400 900 691200 3600
+knotc zone-set matrix.lan dns 3600 A 172.17.0.2
+knotc zone-set matrix.lan blackbox 3600 A 172.17.0.2
+knotc zone-set matrix.lan ldap 3600 CNAME blackbox
+
+# knotc zone-set matrix.lan @ 3600 NS dns.matrix.lan.
+# knotc zone-set matrix.lan @ 3600 TXT "rubbel die katz"
+# knotc zone-set matrix.lan _ipp._tcp 3600 SRV "10 20 631 www"
+knotc zone-commit matrix.lan
+```
+
+```bash
+matrix.lan.             7200    SOA     dns.matrix.lan. hostmaster.matrix.lan. 1 86400 900 691200 3600
+_ipp._tcp.matrix.lan.   3600    SRV     10 20 631 blackbox.matrix.lan.
+blackbox.matrix.lan.    3600    A       172.17.0.2
+dns.matrix.lan.         3600    A       172.17.0.2
+ldap.matrix.lan.        3600    CNAME   blackbox.matrix.lan.
+```
+
 
 ## Author and License
 
