@@ -1,5 +1,7 @@
 ---
 
+knot_dependencies: []
+
 knot_rundir: /run/knot
 knot_user: knot
 knot_group: knot
@@ -12,10 +14,8 @@ knot_defaults_config:
   server:
     rundir: "{{ knot_rundir }}"
     user: "{{ knot_user }}:{{ knot_group }}"
-    listen: []
-    #  - '127.0.0.1@53'
-    #  - '::1@53'
-    #  - '127.0.0.1@5353'
+    listen:
+      - '127.0.0.1@53'
   log:
     syslog:
       any: info

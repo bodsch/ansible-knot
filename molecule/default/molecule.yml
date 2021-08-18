@@ -27,7 +27,7 @@ platforms:
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
       # needs only by ubuntu 20.04
-      - /var/lib/docker/overlay2:/var/lib/docker/overlay2:rw
+      # - /var/lib/docker/overlay2:/var/lib/docker/overlay2:rw
 
 provisioner:
   name: ansible

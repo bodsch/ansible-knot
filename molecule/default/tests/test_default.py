@@ -60,12 +60,12 @@ def test_packages(host):
     pp.pprint(release)
 
     packages = []
-    packages.append("iptables")
+    packages.append("knot")
 
-    if(distribution == 'arch'):
-        packages.append("docker")
-    else:
-        packages.append("docker-ce")
+    # if(distribution == 'arch'):
+    #     packages.append("knot")
+    # else:
+    #     packages.append("docker-ce")
 
     for package in packages:
         p = host.package(package)
@@ -73,17 +73,16 @@ def test_packages(host):
 
 
 @pytest.mark.parametrize("dirs", [
-    "/etc/docker",
+    "/etc/knot",
+    "/var/lib/knot"
 ])
 def test_directories(host, dirs):
 
     d = host.file(dirs)
     assert d.is_directory
-    assert d.exists
 
 
 def test_service_running_and_enabled(host):
-
-    service = host.service('docker')
+    service = host.service('knot')
     assert service.is_running
     assert service.is_enabled

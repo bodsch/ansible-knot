@@ -16,28 +16,31 @@
         - default.yaml
       skip: true
 
-# - name: detect installed python version
-#   set_fact:
-#     use_python_version: "{{ ansible_python.version.major }}"
+- name: update package cache
+  package:
+    update_cache: true
+
+- name: install dedendency
+  package:
+    name: "{{ knot_dependencies }}"
+    state: present
+
+- name: get latest system information
+  setup:
+
+# - block:
+#     - name: make sure dnf is installed (only redhat based <8)
+#       package:
+#         name:
+#           - dnf
+#         state: present
 #
-# - name: detect python binary
-#   stat:
-#     path: "/usr/bin/python{{ use_python_version }}"
-#   register: python_binary
-
-- block:
-    - name: make sure dnf is installed (only redhat based <8)
-      package:
-        name:
-          - dnf
-        state: present
-
-    - name: get latest system information
-      setup:
-  when:
-    - ansible_os_family | lower == 'redhat'
-    - ansible_distribution | lower == 'centos'
-    - ansible_distribution_version | int < 8
+#     - name: get latest system information
+#       setup:
+#   when:
+#     - ansible_os_family | lower == 'redhat'
+#     - ansible_distribution | lower == 'centos'
+#     - ansible_distribution_version | int < 8
 
 - name: merge knot configuration between defaults and custom
   set_fact:

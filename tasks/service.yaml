@@ -1,4 +1,9 @@
 ---
 
+- name: start and enable knot service
+  service:
+    name: "knot"
+    state: started
+    enabled: true
 
 ...
