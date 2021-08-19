@@ -20,13 +20,12 @@
 
 - name: ubuntu
   block:
-   - name: add knot ppa
-     apt_repository:
-      repo: ppa:cz.nic-labs/knot-dns-latest
-      state: present
-      update_cache: true
-      validate_certs: false
-
+    - name: add knot ppa
+      apt_repository:
+        repo: ppa:cz.nic-labs/knot-dns-latest
+        state: present
+        update_cache: true
+        validate_certs: false
   when:
     - ansible_distribution | lower == 'ubuntu'
 

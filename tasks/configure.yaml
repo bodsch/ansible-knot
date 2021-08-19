@@ -12,11 +12,6 @@
   notify:
     - 'knot restart'
 
-# - debug:
-#     msg:
-#       - "{{ knot_zones | list }}"
-#       - "{{ knot_zones }}"
-
 - name: "handle zone configs"
   knot_zone:
     state: "{{ item.value.state | default('present') }}"
@@ -26,7 +21,7 @@
     zone_soa: "{{ item.value.soa | default({}) }}"
     name_servers: "{{ item.value.name_servers | default({}) }}"
     records: "{{ item.value.records | default({}) }}"
-  loop  :
+  loop:
     "{{ knot_zones | dict2items }}"
   loop_control:
     label: "{{ item.key }}"
