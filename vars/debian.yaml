@@ -2,17 +2,4 @@
 
 knot_dependencies: []
 
-# ${SUDO} apt-get -y install apt-transport-https lsb-release ca-certificates wget
-# ${SUDO} wget -O /usr/share/keyrings/knot.gpg https://deb.knot-dns.cz/apt.gpg
-# ${SUDO} sh -c 'echo "deb [signed-by=/usr/share/keyrings/knot.gpg] https://deb.knot-dns.cz/knot-latest/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/knot-latest.list'
-# ${SUDO} apt-get update
-
-## Install Knot DNS server:
-
-# ${SUDO} apt-get install knot
-
-## Install Knot DNS utilities:
-
-# ${SUDO} apt-get install knot-dnsutils
-
 ...

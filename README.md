@@ -21,8 +21,8 @@ not known
 Tested on
 
 * Debian 9 / 10
-* Ubuntu 18.04 / 20.04
-* CentOS 7 / 8
+* Ubuntu 20.04
+* CentOS 8
 * OracleLinux 8
 * ArchLinux
 

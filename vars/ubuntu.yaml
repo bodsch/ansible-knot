@@ -3,17 +3,4 @@
 knot_dependencies:
   - iproute2
 
-# # Enable this repository (as root):
-#
-# LC_ALL=C.UTF-8 add-apt-repository ppa:cz.nic-labs/knot-dns-latest
-# apt-get update
-#
-# # Install Knot DNS server:
-#
-# apt-get install knot
-#
-# # Install Knot DNS utilities:
-#
-# apt-get install knot-dnsutils
-
 ...
