@@ -108,11 +108,11 @@ knotc zone-set molecule.local _https._tcp 3600 SRV "10 20 433 www"
 knotc zone-commit molecule.local
 ```
 
-more under https://www.knot-dns.cz/docs/3.1/html/operation.html
+more under [knot operation doku](https://www.knot-dns.cz/docs/3.1/html/operation.html)
 
 ## Author and License
 
-  - Bodo Schulz
+- Bodo Schulz
 
 ## License
 
