@@ -1,0 +1,16 @@
+---
+
+knot_dependencies:
+  - dnf
+  - iptables
+
+# ( $ dnf install 'dnf-command(copr)' or $ yum install yum-plugin-copr )
+# ( $ dnf install epel-release )
+# $ dnf copr enable @cznic/knot-dns-latest
+#
+# Install Knot DNS server or DNS utilities:
+#
+# $ dnf install knot
+# $ dnf install knot-utils
+
+...

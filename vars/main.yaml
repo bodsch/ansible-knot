@@ -1,0 +1,36 @@
+---
+
+knot_dependencies: []
+
+knot_rundir: /run/knot
+knot_user: knot
+knot_group: knot
+
+knot_database: /var/lib/knot
+
+knot_knotc: /usr/sbin/knotc
+
+knot_defaults_config:
+  server:
+    rundir: "{{ knot_rundir }}"
+    user: "{{ knot_user }}:{{ knot_group }}"
+    listen:
+      - '127.0.0.1@53'
+  log:
+    syslog:
+      any: info
+  database:
+    storage: "{{ knot_database }}"
+  remote: {}
+  acl: {}
+  template:
+    default:
+      storage: "{{ knot_database }}"
+      file: "%s.zone"
+  zone: {}
+
+knot_packages:
+  - knot
+  - knot-dnsutils
+
+...

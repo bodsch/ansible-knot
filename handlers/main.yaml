@@ -1,0 +1,13 @@
+---
+
+- name: 'knot restart'
+  service:
+    name: 'knot'
+    state: 'restarted'
+
+- name: 'knot reload'
+  service:
+    name: 'knot'
+    state: 'reloaded'
+
+...

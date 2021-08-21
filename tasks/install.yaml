@@ -1,0 +1,9 @@
+---
+
+- name: installing knot-dns
+  package:
+    name: "knot"
+    state: "present"
+
+
+...
