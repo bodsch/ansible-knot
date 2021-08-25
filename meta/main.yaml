@@ -1,4 +1,39 @@
 ---
 
+galaxy_info:
+  role_name: knot
+  namespace: bodsch
+
+  author: Bodo Schulz
+  description: installs, configures knot
+
+  license: Apache
+  min_ansible_version: 2.9
+
+  platforms:
+    - name: Ubuntu
+      versions:
+        # 18.04
+        - bionic
+        # 20.04
+        - focal
+    - name: Debian
+      versions:
+        # 9
+        - etch
+        # 10
+        - buster
+    - name: EL
+      versions:
+        - 7
+        - 8
+    - name: ArchLinux
+
+  galaxy_tags:
+    - dns
+    - knot
+
+dependencies: []
+
 
 ...
