@@ -1,5 +1,6 @@
 ---
 
-knot_dependencies: []
+knot_dependencies:
+  - gpg
 
 ...
