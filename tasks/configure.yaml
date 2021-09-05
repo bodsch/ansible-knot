@@ -3,7 +3,7 @@
 - name: 'update configuration'
   template:
     src: 'etc/knot/knot.conf.j2'
-    dest: '/etc/knot/knot.conf'
+    dest: "{{ knot_config_file }}"
     owner: 'root'
     group: "{{ knot_group }}"
     mode: "0o640"
