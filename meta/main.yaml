@@ -28,6 +28,9 @@ galaxy_info:
         - 7
         - 8
     - name: ArchLinux
+    - name: FreeBSD
+      versions:
+        - 13.0
 
   galaxy_tags:
     - dns

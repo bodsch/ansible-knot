@@ -1,0 +1,8 @@
+---
+knot_packages:
+  - knot3
+
+knot_config_file: /usr/local/etc/knot/knot.conf
+knot_rundir: /var/run/knot
+knot_knotc: /usr/local/sbin/knotc
+knot_database: /var/db/knot
