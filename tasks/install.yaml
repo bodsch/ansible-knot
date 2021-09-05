@@ -1,8 +1,16 @@
 ---
 
-- name: installing knot-dns
+- name: installing dependencies
   package:
-    name: "knot"
+    name: "{{ item }}"
     state: "present"
+  with_items: "{{ knot_dependencies }}"
+  when: knot_dependencies
+
+- name: installing knot package(s)
+  package:
+    name: "{{ item }}"
+    state: "present"
+  with_items: "{{ knot_packages }}"
 
 ...
