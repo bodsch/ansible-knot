@@ -33,4 +33,6 @@ knot_packages:
   - knot
   - knot-dnsutils
 
+knot_python_packages: []
+
 ...
