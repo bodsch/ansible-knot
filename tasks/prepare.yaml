@@ -26,6 +26,9 @@
   package:
     name: "{{ knot_dependencies }}"
     state: present
+  when:
+    - knot_dependecies is defined
+    - knot_dependecies | count > 0
 
 - name: create requirements.txt
   template:
