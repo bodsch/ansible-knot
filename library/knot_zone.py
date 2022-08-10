@@ -70,7 +70,7 @@ class KnotZoneConfig(object):
             _changed = False
             for f in [self.config_file, self.config_checksum, self.config_serial]:
                 # self.module.log(msg="remove file : {}".format(f))
-                if(os.path.isdir(f)):
+                if os.path.isdir(f):
                     _changed = True
                     os.remove(f)
 
