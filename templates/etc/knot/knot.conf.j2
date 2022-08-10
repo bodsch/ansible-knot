@@ -1,3 +1,4 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
 # {{ ansible_managed }}
 
 # https://www.knot-dns.cz/docs/3.0/singlehtml/
@@ -5,32 +6,32 @@
 # https://www.knot-dns.cz/docs/3.0/singlehtml/#server-section
 {% if knot_config %}
 server:
-  rundir: "{{  knot_config.server.rundir }}"
+  rundir: "{{ knot_config.server.rundir }}"
   user: {{ knot_user }}:{{ knot_group }}
-{% if knot_config.server.listen %}
-{% for listen in knot_config.server.listen %}
+  {% if knot_config.server.listen %}
+    {% for listen in knot_config.server.listen %}
   listen: {{ listen }}
-{% endfor %}
-{% endif %}
+    {% endfor %}
+  {% endif %}
 
 # https://www.knot-dns.cz/docs/3.0/singlehtml/#logging-section
-{% if knot_config.log %}
+  {% if knot_config.log %}
 log:
-{% for k, v in knot_config.log.items() %}
+    {% for k, v in knot_config.log.items() %}
   - target: {{ k }}
-{% for x,y in v.items() %}
+      {% for x,y in v.items() %}
     {{ x }}: {{ y }}
-{% endfor %}
-{% endfor %}
-{% endif %}
+      {% endfor %}
+    {% endfor %}
+  {% endif %}
 
 # https://www.knot-dns.cz/docs/3.0/singlehtml/#database-section
-{% if knot_config.database %}
+  {% if knot_config.database %}
 database:
-{% for x,y in knot_config.database.items() %}
+    {% for x,y in knot_config.database.items() %}
   {{ x }}: {{ y }}
-{% endfor %}
-{% else %}
+    {% endfor %}
+  {% else %}
 # database:
 #     storage: STR
 #     journal-db: STR
@@ -42,56 +43,74 @@ database:
 #     timer-db-max-size: SIZE
 #     catalog-db: str
 #     catalog-db-max-size: SIZE
-{% endif %}
+  {% endif %}
 
 # https://www.knot-dns.cz/docs/3.0/singlehtml/#remote-section
-{% if knot_config.remote %}
+  {% if knot_config.remote %}
 remote:
-{% for k, v in knot_config.remote.items() %}
+    {% for k, v in knot_config.remote.items() %}
   - id: {{ k }}
-{% for x,y in v.items() %}
+      {% for x,y in v.items() %}
     {{ x }}: {{ y }}
-{% endfor %}
-{% endfor %}
-{% endif %}
+      {% endfor %}
+    {% endfor %}
+  {% endif %}
 
 # https://www.knot-dns.cz/docs/3.0/singlehtml/#acl-section
-{% if knot_config.acl %}
+  {% if knot_config.acl %}
 acl:
-{% for k, v in knot_config.acl.items() %}
+    {% for k, v in knot_config.acl.items() %}
   - id: {{ k }}
-{% for x,y in v.items() %}
+      {% for x,y in v.items() %}
     {{ x }}: {{ y }}
-{% endfor %}
-{% endfor %}
-{% endif %}
+      {% endfor %}
+    {% endfor %}
+  {% endif %}
 
 # https://www.knot-dns.cz/docs/3.0/singlehtml/#template-section
-{% if knot_config.template %}
+  {% if knot_config.template %}
 template:
-{% for k, v in knot_config.template.items() %}
+    {% for k, v in knot_config.template.items() %}
   - id: {{ k }}
-{% for x,y in v.items() %}
+      {% for x,y in v.items() %}
     {{ x }}: {{ y }}
-{% endfor %}
-{% endfor %}
-{% endif %}
+      {% endfor %}
+    {% endfor %}
+  {% endif %}
 
 # https://www.knot-dns.cz/docs/3.0/singlehtml/#zone-section
-{% if knot_config.zone %}
+  {% if knot_config.zone %}
 zone:
-{% for k, v in knot_config.zone.items() %}
+    {% for k, v in knot_config.zone.items() %}
   - domain: {{ k }}
-{% for x,y in v.items() %}
+      {% for x,y in v.items() %}
     {{ x }}: {{ y }}
-{% endfor %}
-{% endfor %}
-{% endif %}
+      {% endfor %}
+    {% endfor %}
+  {% endif %}
 
 # https://www.knot-dns.cz/docs/3.0/singlehtml/#control-section
-# https://www.knot-dns.cz/docs/3.0/singlehtml/#statistics-section
-# https://www.knot-dns.cz/docs/3.0/singlehtml/#key-section
-# https://www.knot-dns.cz/docs/3.0/singlehtml/#submission-section
-# https://www.knot-dns.cz/docs/3.0/singlehtml/#policy-section
+  {% if knot_config.control %}
+control:{{ knot_config.control | to_nice_yaml }}
+  {% endif %}
 
+# https://www.knot-dns.cz/docs/3.0/singlehtml/#statistics-section
+  {% if knot_config.statistics %}
+statistics:{{ knot_config.statistics | to_nice_yaml }}
+  {% endif %}
+
+# https://www.knot-dns.cz/docs/3.0/singlehtml/#key-section
+  {% if knot_config.key %}
+key:{{ knot_config.key | to_nice_yaml }}
+  {% endif %}
+
+# https://www.knot-dns.cz/docs/3.0/singlehtml/#submission-section
+  {% if knot_config.submission %}
+submission:{{ knot_config.submission | to_nice_yaml }}
+  {% endif %}
+
+# https://www.knot-dns.cz/docs/3.0/singlehtml/#policy-section
+  {% if knot_config.policy %}
+policy:{{ knot_config.policy | to_nice_yaml }}
+  {% endif %}
 {% endif %}

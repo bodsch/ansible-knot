@@ -28,6 +28,11 @@ knot_defaults_config:
       storage: "{{ knot_database }}"
       file: "%s.zone"
   zone: {}
+  control: {}
+  statistics: {}
+  key: {}
+  submission: {}
+  policy: {}
 
 knot_packages:
   - knot
