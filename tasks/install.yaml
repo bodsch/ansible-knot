@@ -2,7 +2,7 @@
 
 - name: installing knot-dns
   package:
-    name: "knot"
-    state: "present"
+    name: "{{ knot_packages }}"
+    state: present
 
 ...
