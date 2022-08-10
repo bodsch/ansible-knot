@@ -2,5 +2,6 @@
 
 knot_dependencies:
   - gpg
+  - iproute2
 
 ...

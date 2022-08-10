@@ -30,7 +30,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_REGISTRY_TOKEN }}
           VALIDATE_ALL_CODEBASE: true
           VALIDATE_ANSIBLE: true
-          VALIDATE_MARKDOWN: true
+          # VALIDATE_MARKDOWN: true
           VALIDATE_YAML: true
 
   arch:
@@ -93,7 +93,6 @@ jobs:
         scenario:
           - default
 
-
     steps:
       - name: check out the codebase.
         uses: actions/checkout@v2
@@ -133,7 +132,6 @@ jobs:
           - almalinux:8
         ansible-version:
           - '5.1'
-
     steps:
       - name: check out the codebase.
         uses: actions/checkout@v2
@@ -170,3 +168,4 @@ jobs:
         uses: robertdebock/galaxy-action@1.2.1
         with:
           galaxy_api_key: ${{ secrets.galaxy_api_key }}
+          git_branch: main

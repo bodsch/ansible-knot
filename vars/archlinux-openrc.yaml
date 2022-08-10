@@ -3,7 +3,7 @@
 knot_packages:
   - knot-openrc
 
-docker_python_packages:
+knot_python_packages:
   - name: jinja2
     version: 3.0.1
 

@@ -29,8 +29,8 @@
   when:
     - ansible_distribution | lower == 'ubuntu'
 
-- block:
-    #
+- name: redhat family
+  block:
     - name: Import EPEL GPG key.
       rpm_key:
         key: https://archive.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}
