@@ -11,8 +11,10 @@ knot_config:
     syslog:
       any: info
     stderr:
-      server: critical
-      any: debug
+      server: notice
+      control: notice
+      zone: notice
+      any: notice
 
   database:
     storage: "{{ knot_database }}"
@@ -22,11 +24,24 @@ knot_config:
       storage: "{{ knot_database }}"
       file: "%s.zone"
 
+  acl:
+    update_acl:
+      address: 127.0.0.1
+      action: update
+      key: molecule
+
   zone:
-    molecule.local: {}
+    molecule.local:
       # master: master
-      #acl:
-      #  - acl_internal
+      acl: update_acl
+      file: molecule.local.zone
+
+  key:
+    molecule:
+      algorithm: hmac-sha256
+      # base64 coded!
+      # echo 8z4cp9L0MSESNg3Gv3cHXKQPFvSfDxwt | base64 -w0
+      secret: OHo0Y3A5TDBNU0VTTmczR3YzY0hYS1FQRnZTZkR4d3QK
 
 knot_zones:
   molecule.local:

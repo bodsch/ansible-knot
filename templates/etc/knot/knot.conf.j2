@@ -1,9 +1,6 @@
 #jinja2: trim_blocks: True, lstrip_blocks: True
 # {{ ansible_managed }}
 
-# https://www.knot-dns.cz/docs/3.0/singlehtml/
-
-# https://www.knot-dns.cz/docs/3.0/singlehtml/#server-section
 {% if knot_config %}
 server:
   rundir: "{{ knot_config.server.rundir }}"
@@ -12,40 +9,43 @@ server:
     {% for listen in knot_config.server.listen %}
   listen: {{ listen }}
     {% endfor %}
-  {% endif %}
 
-# https://www.knot-dns.cz/docs/3.0/singlehtml/#logging-section
+  {% endif %}
   {% if knot_config.log %}
 log:
+    {% set _valid_target = ["stdout", "stderr", "syslog"] %}
+    {% set _valid_level = ["critical", "error", "warning", "notice", "info", "debug"] %}
+    {% set _valid_keys = ["target", "server", "control", "zone", "any"] %}
     {% for k, v in knot_config.log.items() %}
   - target: {{ k }}
+      {% for x, y in v.items() %}
+        {% if y not in _valid_level %}
+          {% set y = "info" %}
+        {% endif %}
+        {% if x in _valid_keys %}
+    {{ x }}: {{ y }}
+        {% endif %}
+      {% endfor %}
+    {% endfor %}
+
+  {% endif %}
+  {% if knot_config.key %}
+key:
+    {% for k, v in knot_config.key.items() %}
+  - id: {{ k }}
       {% for x,y in v.items() %}
     {{ x }}: {{ y }}
       {% endfor %}
     {% endfor %}
-  {% endif %}
 
-# https://www.knot-dns.cz/docs/3.0/singlehtml/#database-section
+  {% endif %}
   {% if knot_config.database %}
 database:
     {% for x,y in knot_config.database.items() %}
   {{ x }}: {{ y }}
     {% endfor %}
-  {% else %}
-# database:
-#     storage: STR
-#     journal-db: STR
-#     journal-db-mode: robust | asynchronous
-#     journal-db-max-size: SIZE
-#     kasp-db: STR
-#     kasp-db-max-size: SIZE
-#     timer-db: STR
-#     timer-db-max-size: SIZE
-#     catalog-db: str
-#     catalog-db-max-size: SIZE
-  {% endif %}
 
-# https://www.knot-dns.cz/docs/3.0/singlehtml/#remote-section
+  {% endif %}
   {% if knot_config.remote %}
 remote:
     {% for k, v in knot_config.remote.items() %}
@@ -54,9 +54,8 @@ remote:
     {{ x }}: {{ y }}
       {% endfor %}
     {% endfor %}
-  {% endif %}
 
-# https://www.knot-dns.cz/docs/3.0/singlehtml/#acl-section
+  {% endif %}
   {% if knot_config.acl %}
 acl:
     {% for k, v in knot_config.acl.items() %}
@@ -65,9 +64,8 @@ acl:
     {{ x }}: {{ y }}
       {% endfor %}
     {% endfor %}
-  {% endif %}
 
-# https://www.knot-dns.cz/docs/3.0/singlehtml/#template-section
+  {% endif %}
   {% if knot_config.template %}
 template:
     {% for k, v in knot_config.template.items() %}
@@ -76,9 +74,8 @@ template:
     {{ x }}: {{ y }}
       {% endfor %}
     {% endfor %}
-  {% endif %}
 
-# https://www.knot-dns.cz/docs/3.0/singlehtml/#zone-section
+  {% endif %}
   {% if knot_config.zone %}
 zone:
     {% for k, v in knot_config.zone.items() %}
@@ -87,30 +84,39 @@ zone:
     {{ x }}: {{ y }}
       {% endfor %}
     {% endfor %}
-  {% endif %}
 
-# https://www.knot-dns.cz/docs/3.0/singlehtml/#control-section
+  {% endif %}
   {% if knot_config.control %}
-control:{{ knot_config.control | to_nice_yaml }}
-  {% endif %}
+control:
+    {% for x,y in knot_config.control.items() %}
+  {{ x }}: {{ y }}
+    {% endfor %}
 
-# https://www.knot-dns.cz/docs/3.0/singlehtml/#statistics-section
+  {% endif %}
   {% if knot_config.statistics %}
-statistics:{{ knot_config.statistics | to_nice_yaml }}
-  {% endif %}
+statistics:
+    {% for x,y in knot_config.statistics.items() %}
+  {{ x }}: {{ y }}
+    {% endfor %}
 
-# https://www.knot-dns.cz/docs/3.0/singlehtml/#key-section
-  {% if knot_config.key %}
-key:{{ knot_config.key | to_nice_yaml }}
   {% endif %}
-
-# https://www.knot-dns.cz/docs/3.0/singlehtml/#submission-section
   {% if knot_config.submission %}
-submission:{{ knot_config.submission | to_nice_yaml }}
-  {% endif %}
+submission:
+    {% for k, v in knot_config.submission.items() %}
+  - id: {{ k }}
+      {% for x,y in v.items() %}
+    {{ x }}: {{ y }}
+      {% endfor %}
+    {% endfor %}
 
-# https://www.knot-dns.cz/docs/3.0/singlehtml/#policy-section
+  {% endif %}
   {% if knot_config.policy %}
-policy:{{ knot_config.policy | to_nice_yaml }}
+policy:
+    {% for k, v in knot_config.policy.items() %}
+  - id: {{ k }}
+      {% for x,y in v.items() %}
+    {{ x }}: {{ y }}
+      {% endfor %}
+    {% endfor %}
   {% endif %}
 {% endif %}
