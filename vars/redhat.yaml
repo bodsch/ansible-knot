@@ -4,4 +4,7 @@ knot_dependencies:
   - dnf
   - iproute
 
+knot_packages:
+  - knot
+
 ...

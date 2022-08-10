@@ -24,6 +24,14 @@
         - ansible_distribution | lower == 'archlinux' or
           ansible_os_family | lower == 'artix linux'
 
+    - name: ubuntu
+      block:
+        - name: create generic link for python
+          file:
+            state: link
+            src: /usr/bin/python3
+            dest: /usr/bin/python
+
     - debug:
         msg:
           - "os family            : {{ ansible_distribution }} ({{ ansible_os_family }})"
