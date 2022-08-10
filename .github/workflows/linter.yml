@@ -1,6 +1,6 @@
 ---
 
-name: Code Linter
+name: code linter
 
 on:
   workflow_dispatch:

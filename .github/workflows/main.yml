@@ -2,12 +2,16 @@
 name: CI
 
 on:
-  pull_request:
-  push:
-    branches:
-      - main
   schedule:
     - cron: "0 2 * * 0"
+  workflow_dispatch:
+  workflow_run:
+    workflows:
+      - "code linter"
+    branches:
+      - main
+    types:
+      - completed
 
 defaults:
   run:
@@ -18,6 +22,7 @@ jobs:
   arch:
     name: "${{ matrix.image }} / ansible: ${{ matrix.ansible-version }}"
     runs-on: ubuntu-20.04
+    if: ${{ github.event_name == 'schedule' || github.event.workflow_run.conclusion == 'success' }}
     strategy:
       fail-fast: false
       matrix:
@@ -66,7 +71,6 @@ jobs:
           - debian:11
           - ubuntu:20.04
         ansible-version:
-          - '4.10'
           - '5.1'
           - '6.1'
         scenario:
@@ -108,6 +112,7 @@ jobs:
           - rockylinux:8
           - almalinux:8
         ansible-version:
+          - '4.10'
           - '5.1'
     steps:
       - name: check out the codebase.
