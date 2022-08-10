@@ -4,13 +4,33 @@
   gather_facts: true
 
   pre_tasks:
-    - name: archlinux
+    - name: arch- / artixlinux
       block:
         - name: update pacman system
           command: |
             pacman --refresh --sync --sysupgrade --noconfirm
+
+        - name: create depends service
+          copy:
+            mode: 0755
+            dest: /etc/init.d/net
+            content: |
+              #!/usr/bin/openrc-run
+              true
+          when:
+            - ansible_os_family | lower == 'artix linux'
+
       when:
-        - ansible_distribution | lower == 'archlinux'
+        - ansible_distribution | lower == 'archlinux' or
+          ansible_os_family | lower == 'artix linux'
+
+    - name: ubuntu
+      block:
+        - name: create generic link for python
+          file:
+            state: link
+            src: /usr/bin/python3
+            dest: /usr/bin/python
 
     - debug:
         msg:

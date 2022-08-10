@@ -15,6 +15,8 @@
         - "{{ ansible_distribution | lower }}.yaml"
         # eg. redhat / debian / archlinux
         - "{{ ansible_os_family | lower }}.yaml"
+        # artixlinux
+        - "{{ ansible_os_family | lower | replace(' ', '') }}.yaml"
         - default.yaml
       skip: true
 
@@ -47,6 +49,21 @@
   when:
     - knot_python_packages is defined
     - knot_python_packages | count > 0
+
+- name: create requirements.txt
+  template:
+    src: requirements.txt.j2
+    dest: /tmp/knot-requirements.txt
+    mode: 0660
+
+- name: install python packages
+  pip:
+    # executable: pip3
+    requirements: /tmp/knot-requirements.txt
+    state: present
+  ignore_errors: true
+  register: pip_install
+  # no_log: true
 
 - name: get latest system information
   setup:
