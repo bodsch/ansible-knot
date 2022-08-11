@@ -21,9 +21,8 @@ galaxy_info:
       versions:
         # 20.04
         - focal
-    - name: EL
-      versions:
-        - 8
+        # 22.04
+        - jammy
 
   galaxy_tags:
     - dns

@@ -8,7 +8,7 @@
         id: 8C0A90B7DE9CAC3B4A7BD5798A0EFB02C84B1E9B
         url: https://deb.knot-dns.cz/apt.gpg
 
-    - name: install official docker repositories for debian based
+    - name: install official knot repositories for debian based
       template:
         src: apt_knot.list.j2
         dest: /etc/apt/sources.list.d/knot.list
@@ -20,35 +20,15 @@
 
 - name: ubuntu
   block:
-    - name: add knot ppa
+    - name: add knot ppa for ubuntu {{ ansible_distribution_release }}
       apt_repository:
         repo: ppa:cz.nic-labs/knot-dns-latest
+        codename: "{{ ansible_distribution_release }}"
         state: present
         update_cache: true
         validate_certs: false
   when:
     - ansible_distribution | lower == 'ubuntu'
-
-- name: redhat family
-  block:
-    - name: Import EPEL GPG key.
-      rpm_key:
-        key: https://archive.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}
-        state: present
-
-    - name: install EPEL repository
-      yum_repository:
-        name: epel
-        state: present
-        description: Extra Packages for Enterprise Linux {{ ansible_distribution_major_version }} - $basearch
-        baseurl: http://download.fedoraproject.org/pub/epel/{{ ansible_distribution_major_version }}/$basearch
-        gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}
-        metalink: https://mirrors.fedoraproject.org/metalink?repo=epel-{{ ansible_distribution_major_version }}&arch=$basearch&infra=$infra&content=$contentdir
-        failovermethod: priority
-        gpgcheck: 1
-        enabled: 1
-  when:
-    - ansible_os_family | lower == 'redhat'
 
 - name: update package cache
   package:
