@@ -1,12 +1,12 @@
 ---
 
 - name: 'knot restart'
-  service:
+  ansible.builtin.service:
     name: 'knot'
     state: 'restarted'
 
 - name: 'knot reload'
-  service:
+  ansible.builtin.service:
     name: 'knot'
     state: 'reloaded'
 

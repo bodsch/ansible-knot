@@ -47,10 +47,10 @@ class KnotZoneConfig(object):
         self.group               = module.params.get("group")
         self.mode                = module.params.get("mode")
 
-        self.zone_path           = "{0}".format(self.database_path)  # , self.zone)
-        self.config_file         = "{0}/{1}.zone".format(self.zone_path, self.zone)
-        self.config_checksum     = "{0}/.{1}.checksum".format(self.zone_path, self.zone)
-        self.config_serial       = "{0}/.{1}.serial".format(self.zone_path, self.zone)
+        self.zone_path           = f"{self.database_path}"
+        self.config_file         = f"{self.zone_path}/{self.zone}.zone"
+        self.config_checksum     = f"{self.zone_path}/.{self.zone}.checksum"
+        self.config_serial       = f"{self.zone_path}/.{self.zone}.serial"
 
         # self.module.log(msg="---------------------------------------------")
         # self.module.log(msg="zone_path      : {}".format(self.zone_path))
@@ -92,11 +92,14 @@ class KnotZoneConfig(object):
         _data_changed = False
 
         data = dict()
-        data["zone"] = self.zone
-        data["zone_ttl"] = self.zone_ttl
-        data["soa"] = self.zone_soa
-        data["name_servers"] = self.name_servers
-        data["records"] = self.records
+
+        data.update({
+            "zone": self.zone,
+            "zone_ttl": self.zone_ttl,
+            "soa": self.zone_soa,
+            "name_servers": self.name_servers,
+            "records": self.records
+        })
 
         # self.module.log(msg="---------------------------------------------")
         # self.module.log(msg="data      : {}".format(json.dumps(data, sort_keys=True)))
@@ -108,9 +111,6 @@ class KnotZoneConfig(object):
             with open(self.config_checksum, "r") as fp:
                 _old_checksum = fp.readlines()[0]
 
-        # self.module.log(msg="checksum current config: {}".format(_checksum))
-        # self.module.log(msg="old checksum   : {}".format(_old_checksum))
-
         if _old_checksum == _checksum:
             return dict(
                 changed = False,
@@ -118,22 +118,21 @@ class KnotZoneConfig(object):
                 msg = "no changes"
             )
 
-        # compare both checksums
-        if _old_checksum != _checksum:
-            soa_serial = self.__zone_serial()
-            data["soa"]["serial"] = soa_serial
+        soa_serial = self.__zone_serial()
+        data["soa"]["serial"] = soa_serial
 
-            self.__write_template(self.config_file, data)
+        self.__write_template(self.config_file, data)
 
-            with open(self.config_serial, "w") as fp:
-                fp.write(soa_serial)
+        with open(self.config_serial, "w") as fp:
+            fp.write(soa_serial)
 
-            with open(self.config_checksum, "w") as fp:
-                fp.write(_checksum)
+        with open(self.config_checksum, "w") as fp:
+            fp.write(_checksum)
 
         return dict(
             changed = _data_changed,
             failed = False,
+            soa_serial = soa_serial,
             msg = "config created"
         )
 
@@ -159,10 +158,7 @@ class KnotZoneConfig(object):
                 # id = id + 1
                 id = "{0:02d}".format(id + 1)
 
-        _serial = "{0}{1}".format(
-            now,
-            id
-        )
+        _serial = f"{now}{id}"
 
         # self.module.log(msg="serial      : {}".format(_serial))
 
@@ -172,11 +168,10 @@ class KnotZoneConfig(object):
         """
             create checksum from string
         """
-        password_bytes = plaintext.encode('utf-8')
-        password_hash = hashlib.sha256(password_bytes)
-        checksum = password_hash.hexdigest()
+        _bytes = plaintext.encode('utf-8')
+        _hash = hashlib.sha256(_bytes)
 
-        return checksum
+        return _hash.hexdigest()
 
     def __write_template(self, file_name, data):
         """

@@ -1,7 +1,7 @@
 ---
 
 - name: 'update configuration'
-  template:
+  ansible.builtin.template:
     src: 'etc/knot/knot.conf.j2'
     dest: '/etc/knot/knot.conf'
     owner: 'root'
