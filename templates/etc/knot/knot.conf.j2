@@ -30,6 +30,7 @@ log:
 
   {% endif %}
   {% if knot_config.key %}
+  {# https://www.knot-dns.cz/docs/3.0/singlehtml/#key-section #}
 key:
     {% for k, v in knot_config.key.items() %}
   - id: {{ k }}
@@ -94,12 +95,14 @@ control:
 
   {% endif %}
   {% if knot_config.statistics %}
+  {# https://www.knot-dns.cz/docs/3.0/singlehtml/#statistics-section #}
 statistics:
     {% for x,y in knot_config.statistics.items() %}
   {{ x }}: {{ y }}
     {% endfor %}
 
   {% endif %}
+  {# https://www.knot-dns.cz/docs/3.0/singlehtml/#submission-section #}
   {% if knot_config.submission %}
 submission:
     {% for k, v in knot_config.submission.items() %}
@@ -111,6 +114,7 @@ submission:
 
   {% endif %}
   {% if knot_config.policy %}
+  {# https://www.knot-dns.cz/docs/3.0/singlehtml/#policy-section #}
 policy:
     {% for k, v in knot_config.policy.items() %}
   - id: {{ k }}
