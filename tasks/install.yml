@@ -48,6 +48,4 @@
       ansible.builtin.fail:
         msg: Sorry, but a serious error occurred when installing the required Python packages.
 
-
-
 ...
