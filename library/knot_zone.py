@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# (c) 2020, Bodo Schulz <bodo@boone-schulz.de>
+# (c) 2020-2023, Bodo Schulz <bodo@boone-schulz.de>
 # BSD 2-clause (see LICENSE or https://opensource.org/licenses/BSD-2-Clause)
 
 from __future__ import absolute_import, division, print_function
@@ -10,6 +10,7 @@ import json
 import hashlib
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.bodsch.core.plugins.module_utils.directory import create_directory
 
 __metaclass__ = type
 
@@ -24,13 +25,11 @@ ANSIBLE_METADATA = {
 
 class KnotZoneConfig(object):
     """
-      Main Class to implement the Icinga2 API Client
     """
     module = None
 
     def __init__(self, module):
         """
-          Initialize all needed Variables
         """
         self.module = module
 
@@ -69,7 +68,6 @@ class KnotZoneConfig(object):
             """
             _changed = False
             for f in [self.config_file, self.config_checksum, self.config_serial]:
-                # self.module.log(msg="remove file : {}".format(f))
                 if os.path.isdir(f):
                     _changed = True
                     os.remove(f)
@@ -80,12 +78,7 @@ class KnotZoneConfig(object):
                 msg = "zone removed"
             )
 
-        if not os.path.isdir(self.zone_path):
-            try:
-                # Create Directory
-                os.mkdir(self.zone_path)
-            except FileExistsError:
-                pass
+        create_directory(directory=self.zone_path, mode="0750")
 
         _checksum = ''
         _old_checksum = ''
@@ -115,8 +108,15 @@ class KnotZoneConfig(object):
             return dict(
                 changed = False,
                 failed = False,
-                msg = "no changes"
+                msg = f"zone file {self.zone} has no changes."
             )
+        else:
+            if os.path.isfile(self.config_file):
+                msg = f"zone file {self.zone} successfully updated."
+            else:
+                msg = f"zone file {self.zone} successfully created."
+
+            _data_changed = True
 
         soa_serial = self.__zone_serial()
         data["soa"]["serial"] = soa_serial
@@ -133,7 +133,7 @@ class KnotZoneConfig(object):
             changed = _data_changed,
             failed = False,
             soa_serial = soa_serial,
-            msg = "config created"
+            msg = msg
         )
 
     def __zone_serial(self):
@@ -175,62 +175,61 @@ class KnotZoneConfig(object):
 
     def __write_template(self, file_name, data):
         """
-
         """
         tpl = """
 $ORIGIN {{ item.zone }}.
 $TTL {{ item.zone_ttl }}
 
 @  SOA  {{ item.soa.primary_dns }}. {{ item.soa.hostmaster }}. (
-    {{ item.soa.serial }} ; serial
-    {{ item.soa.refresh | default('6h') }} ; refresh
-    {{ item.soa.retry | default('1h') }} ; retry
-    {{ item.soa.expire | default('1w') }} ; expire
-    {{ item.soa.minimum | default('1d') }} ) ; minimum
+    {{ item.soa.serial.ljust(2) }}  ; serial
+    {{ (item.soa.refresh | default('6h')).ljust(10) }}  ; refresh
+    {{ (item.soa.retry | default('1h')).ljust(10) }}  ; retry
+    {{ (item.soa.expire | default('1w')).ljust(10) }}  ; expire
+    {{ item.soa.minimum | default('1d') }})         ; minimum
 
 {% if item.name_servers | count > 0 %}
-{%- for k, v in item.name_servers.items()  %}
+    {% for k, v in item.name_servers.items()  %}
 {{ (v.ttl | default('3600')).ljust(10).rjust(42) }}  {{ "NS".ljust(19) }}  {{ (k + '.') }}
 {{ (k + '.').ljust(30) }}  {{ (v.ttl | default('3600')).ljust(10) }}  {{ "A".ljust(19) }}  {{ v.ip }}
-{%- endfor -%}
-{%- endif %}
+    {% endfor %}
+{% endif %}
 
 {% if item.records | count > 0 %}
-{%- for k, v in item.records.items()  %}
-{%- if v.description is defined and v.description | length != 0 %}
+    {% for k, v in item.records.items()  %}
+        {% if v.description is defined and v.description | length != 0 %}
 ;; {{ v.description }}
-{%- endif %}
-{%- if k == '@' %}
-{% set source = item.zone %}
-{%- else %}
-{% set source = v %}
-{%- endif -%}
-{%- if v.type == 'A' -%}
+        {% endif %}
+        {% if k == '@' %}
+            {% set source = item.zone %}
+        {% else %}
+            {% set source = v %}
+        {% endif -%}
+        {% if v.type == 'A' %}
 {{ (k + '.').ljust(30) }}  {{ (v.ttl | default('3600')).ljust(10) }}  {{ v.type.ljust(20) }} {{ v.ip }}
-{%- if v.aliases is defined and v.aliases | count > 0 -%}
-{%- for a in v.aliases -%}
-{% set _source = a + '.' + item.zone %}
-{% set _type = 'CNAME' -%}
+            {% if v.aliases is defined and v.aliases | count > 0 %}
+                {% for a in v.aliases %}
+                    {% set _source = a + '.' + item.zone %}
+                    {% set _type = 'CNAME' %}
 {{ (_source + '.').ljust(30) }}  {{ (v.ttl | default(item.zone_ttl) | string).ljust(10) }}  {{ _type.ljust(20) }} {{ (k + '.') }}
-{%- endfor -%}
-{%- endif %}
-{%- endif %}
-{%- if v.type == 'CNAME' -%}
+                {% endfor %}
+            {% endif %}
+        {% endif %}
+        {% if v.type == 'CNAME' %}
 {{ (k + '.').ljust(30) }}  {{ (v.ttl | default('3600')).ljust(10) }}  {{ v.type.ljust(20) }} {{ v.target }}.
-{%- endif %}
-{%- if v.type == 'TXT' -%}
+        {% endif %}
+        {% if v.type == 'TXT' %}
 {{ (source + '.').ljust(30) }}  {{ (v.ttl | default('3600')).ljust(10) }}  {{ v.type.ljust(20) }} "{{ v.text }}"
-{%- endif %}
-{%- if v.type == 'SRV' -%}
+        {% endif %}
+        {% if v.type == 'SRV' %}
 {{ (k + '.').ljust(30) }}  {{ (v.ttl | default('3600')).ljust(10) }}  {{ v.type.ljust(20) }} {{ v.priority }} {{ v.weight }} {{ v.port }} {{ v.target }}.
-{%- endif %}
-{%- endfor %}
-{%- endif %}
+        {% endif %}
+    {% endfor %}
+{% endif %}
 
 """
         from jinja2 import Template
 
-        tm = Template(tpl)
+        tm = Template(tpl, trim_blocks=True, lstrip_blocks=True)
         d = tm.render(item=data)
 
         with open(file_name, "w") as fp:
@@ -246,22 +245,58 @@ $TTL {{ item.zone_ttl }}
 def main():
     """
     """
-    module = AnsibleModule(
-        argument_spec = dict(
-            state = dict(default="present", choices=["absent", "present"]),
-            #
-            zone = dict(required=True, type='str'),
-            zone_ttl = dict(required=True, type='int'),
-            zone_soa = dict(required=True, type='dict'),
-            name_servers = dict(required=True, type='dict'),
-            records = dict(required=True, type='dict'),
-            debug = dict(required=False, type="bool", default=False),
-
-            database_path = dict(required=True, type='str'),
-            owner = dict(required=False, type='str'),
-            group = dict(required=False, type='str'),
-            mode = dict(required=False, type='str', default="0666"),
+    args = dict(
+        state = dict(
+            default="present",
+            choices=["absent", "present"]
         ),
+        #
+        zone = dict(
+            required=True,
+            type='str'
+        ),
+        zone_ttl = dict(
+            required=True,
+            type='int'
+        ),
+        zone_soa = dict(
+            required=True,
+            type='dict'
+        ),
+        name_servers = dict(
+            required=True,
+            type='dict'
+        ),
+        records = dict(
+            required=True,
+            type='dict'
+        ),
+        debug = dict(
+            required=False,
+            type="bool",
+            default=False
+        ),
+        database_path = dict(
+            required=True,
+            type='str'
+        ),
+        owner = dict(
+            required=False,
+            type='str'
+        ),
+        group = dict(
+            required=False,
+            type='str'
+        ),
+        mode = dict(
+            required=False,
+            type='str',
+            default="0666"
+        ),
+    )
+
+    module = AnsibleModule(
+        argument_spec = args,
         supports_check_mode = True,
     )
 

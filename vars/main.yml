@@ -17,12 +17,9 @@ knot_defaults_config:
     user: "{{ knot_user }}:{{ knot_group }}"
     listen:
       - '127.0.0.1@53'
-    background-workers: 2
   #   identity: [STR]
   #   version: [STR]
   #   nsid: [STR|HEXSTR]
-  #   rundir: STR
-  #   user: STR[:STR]
   #   pidfile: STR
   #   udp-workers: INT
   #   tcp-workers: INT
@@ -39,7 +36,6 @@ knot_defaults_config:
   #   udp-max-payload-ipv6: SIZE
   #   edns-client-subnet: BOOL
   #   answer-rotation: BOOL
-  #   listen: ADDR[@INT] ...
   #   listen-xdp: STR[@INT] | ADDR[@INT] ...
 
   # https://www.knot-dns.cz/docs/3.0/singlehtml/#logging-section

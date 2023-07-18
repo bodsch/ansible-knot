@@ -1,8 +1,0 @@
----
-
-- name: installing knot-dns
-  ansible.builtin.package:
-    name: "{{ knot_packages }}"
-    state: present
-
-...

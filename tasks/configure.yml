@@ -1,18 +1,21 @@
 ---
 
-- name: 'update configuration'
+- name: do facts module to get latest information
+  ansible.builtin.setup:
+
+- name: update configuration
   ansible.builtin.template:
-    src: 'etc/knot/knot.conf.j2'
-    dest: '/etc/knot/knot.conf'
-    owner: 'root'
+    src: etc/knot/knot.conf.j2
+    dest: /etc/knot/knot.conf
+    # owner: root
     group: "{{ knot_group }}"
-    mode: "0o640"
+    mode: 0640
     validate: "{{ knot_knotc }} -c %s conf-check"
     backup: true
   notify:
-    - 'knot restart'
+    - knot restart
 
-- name: "handle zone configs"
+- name: handle zone configs
   knot_zone:
     state: "{{ item.value.state | default('present') }}"
     database_path: "{{ knot_database }}"
@@ -26,6 +29,7 @@
   loop_control:
     label: "{{ item.key }}"
   notify:
-    - 'knot reload'
+    - knot reload
+  register: _knot_zone
 
 ...
