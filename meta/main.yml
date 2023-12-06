@@ -28,7 +28,8 @@ galaxy_info:
     - dns
     - knot
 
-dependencies: []
+  dependencies:
+    - bodsch.core
 
 
 ...
